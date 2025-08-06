@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\UploadCenterRequest;
+use App\Models\Upload;
+use Illuminate\Http\Request;
+
+use function PHPUnit\Framework\fileExists;
+
+class UploadController extends Controller
+{
+ 
+    public function index()
+    {
+        $uploads= Upload::paginate('5');
+        return view('upload.index',compact('uploads'));
+        
+    }
+
+  
+    public function create()
+    {
+        return view('upload.create');
+    }
+
+  
+    public function store(UploadCenterRequest $request)
+    {
+        $file= $request->file('image');
+        $image="";
+        if(!empty($file)){
+            $image=sha1(time()).".". $file->getClientOriginalExtension();
+            $file->move('images/upload',$image);
+        }
+       Upload::create([
+        'image'=>$image,
+       ]);
+       $imageUrl = asset('images/upload/'.$image);
+       session()->flash('create','فایل شما با موفیقت بارگذاری شد');
+       return back();
+
+    }
+
+  
+    public function destroy(string $id)
+    {
+        $deleteimage=Upload::findOrFail($id)->image;
+        if(file_exists('images/upload/'.$deleteimage)){
+            unlink('images/upload/'.$deleteimage);
+        }
+
+        Upload::destroy($id);
+        session()->flash('delete','عکس با موفقیت حذف شد');
+        return back();
+    }
+}
