@@ -32,7 +32,14 @@ class UploadController extends Controller
         $image="";
         if(!empty($file)){
             $image=sha1(time()).".". $file->getClientOriginalExtension();
-            $file->move('images/upload',$image);
+            $defaultpath='images/upload';
+            $customepath=$request->input('custom_path');
+            $destinationPath=!empty($customepath)?$customepath:$defaultpath;
+
+            if(!file_exists($destinationPath)){
+                 mkdir($destinationPath, 0777, true); 
+            }
+            $file->move($destinationPath,$image);
         }
        Upload::create([
         'image'=>$image,
