@@ -38,6 +38,12 @@ class UploadController extends Controller
         'image'=>$image,
        ]);
        $imageUrl = asset('images/upload/'.$image);
+       if($request->wantsJson()){
+        return response()->json([
+            'message'=>'عکس با موفقیت اپلود شد',
+            'imageurl'=>$imageUrl
+        ],201);
+       }
        session()->flash('create','فایل شما با موفیقت بارگذاری شد');
        return back();
 
